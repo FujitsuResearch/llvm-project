@@ -14,11 +14,12 @@ on third-party libraries providing the implementation.
 `-DFLANG_RUNTIME_F128_MATH_LIB=libquadmath` CMake option can be used
 when building Flang-RT to provide math entry points in `libflang_rt.quadmath`
 that have unresolved references to GCC `libquadmath` library.
-The Flang driver automatically links `libflang_rt.quadmath`, but does not
-automatically link `libquadmath`. Programs that require its functions must
-be linked with `-lquadmath`. This implies that `libquadmath` library
-has to be available in the library search paths, so that linker
-can find it. The `libquadmath` library installation into Flang project
+The Flang driver links `libflang_rt.quadmath` if it finds it next to the other
+Flang-RT libraries, and additionally links `libquadmath` (as needed) if it
+finds it in the toolchain's library paths, such as the GCC installation.
+Otherwise, programs that require its functions must be linked with
+`-lquadmath` explicitly, which implies that `libquadmath` library has to be
+available in the library search paths, so that linker can find it. The `libquadmath` library installation into Flang project
 distribution is not automatic in CMake currently.
 
 `libflang_rt.quadmath` is built even without a math provider, but then
@@ -48,15 +49,12 @@ addition, subtraction, multiplication, and division. This check is independent
 of the availability of libraries implementing `REAL(16)` math intrinsics.
 Libcall names do not guarantee that the corresponding implementations exist.
 
-When bootstrapping with Flang, the LLVM runtimes build assumes that the
-Fortran compiler supports `REAL(16)` when a math provider is explicitly
-selected, for AArch64 and x86-64 targets, or for native targets whose C
-`long double` has 113 significand bits. In other cases, no setting is added.
-An explicit `FORTRAN_SUPPORTS_REAL16` setting takes precedence.
-This avoids probing an unfinished compiler for the cases above.
-A standalone Flang-RT build instead checks the Fortran compiler unless
-`FORTRAN_SUPPORTS_REAL16` is explicitly supplied. The bootstrap assumption
-does not ensure that a math provider is available.
+Flang-RT includes `REAL(16)` in its intrinsic modules depending on the
+target architecture. It does not probe the Fortran compiler because when
+bootstrapping Flang-RT together with Flang (`LLVM_ENABLE_RUNTIMES=flang-rt`),
+the compiler has not been built yet. An explicit `FORTRAN_SUPPORTS_REAL16`
+setting takes precedence. This does not ensure that a math provider is
+available.
 
 As a result, `REAL(16)` variables and arithmetic operations may be accepted
 even when no library support for `REAL(16)` math intrinsics is available.

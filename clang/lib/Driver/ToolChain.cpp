@@ -983,7 +983,28 @@ void ToolChain::addFortranRuntimeLibs(const ArgList &Args,
   // add the correct libraries to link against as dependents in the object
   // file.
   if (!getTriple().isKnownWindowsMSVCEnvironment()) {
-    CmdArgs.push_back("-lflang_rt.quadmath");
+    // flang_rt.quadmath is optional and may depend on libquadmath. Its math
+    // library dependency on libm is added by the caller.
+    if (getVFS().exists(getCompilerRT(Args, "quadmath", ToolChain::FT_Static,
+                                      /*IsFortran=*/true))) {
+      CmdArgs.push_back("-lflang_rt.quadmath");
+
+      auto HasLibQuadmath = [&]() {
+        for (const char *Name : {"libquadmath.a", "libquadmath.so",
+                                 "libquadmath.dylib", "libquadmath.dll.a"})
+          if (GetFilePathIfExists(Name))
+            return true;
+        return false;
+      };
+      if (HasLibQuadmath()) {
+        bool AsNeeded = !getTriple().isOSAIX() && !getTriple().isOSDarwin();
+        if (AsNeeded)
+          addAsNeededOption(*this, Args, CmdArgs, /*as_needed=*/true);
+        CmdArgs.push_back("-lquadmath");
+        if (AsNeeded)
+          addAsNeededOption(*this, Args, CmdArgs, /*as_needed=*/false);
+      }
+    }
     addFlangRTLibPath(Args, CmdArgs);
 
     // needs libexecinfo for backtrace functions

@@ -41,38 +41,28 @@
 !       executable and may find the GNU linker from MinGW or Cygwin.
 ! UNIX-LABEL:  "{{.*}}ld{{(\.exe)?}}"
 ! UNIX-SAME: "[[object_file]]"
-! UNIX-SAME: "-lflang_rt.quadmath"
-! UNIX-NOT: "-lquadmath"
 ! UNIX-SAME: "-lflang_rt.runtime" "-lm"
 ! COMPILER-RT: "{{.*}}{{\\|/}}libclang_rt.builtins.a"
 ! UNIX-STATIC-FLANGRT:   "{{.*}}{{\\|/}}libflang_rt.runtime.a"
 
 ! BSD-LABEL:  "{{.*}}ld{{(\.exe)?}}"
 ! BSD-SAME: "[[object_file]]"
-! BSD-SAME: "-lflang_rt.quadmath"
-! BSD-NOT: "-lquadmath"
 ! BSD-SAME: -lflang_rt.runtime
 ! BSD-SAME: -lexecinfo
 ! BSD-STATIC-FLANGRT: "{{.*}}{{\\|/}}libflang_rt.runtime.a"
 
 ! DARWIN-LABEL:  "{{.*}}ld{{(\.exe)?}}"
 ! DARWIN-SAME: "[[object_file]]"
-! DARWIN-SAME: "-lflang_rt.quadmath"
-! DARWIN-NOT: "-lquadmath"
 ! DARWIN-SAME: -lflang_rt.runtime
 ! DARWIN-STATIC-FLANGRT: "{{.*}}{{\\|/}}libclang_rt.runtime_osx.a"
 
 ! HAIKU-LABEL:  "{{.*}}ld{{(\.exe)?}}"
 ! HAIKU-SAME: "[[object_file]]"
-! HAIKU-SAME: "-lflang_rt.quadmath"
-! HAIKU-NOT: "-lquadmath"
 ! HAIKU-SAME: "-lflang_rt.runtime"
 ! HAIKU-STATIC-FLANGRT: "{{.*}}{{\\|/}}libflang_rt.runtime.a"
 
 ! MINGW-LABEL:  "{{.*}}ld{{(\.exe)?}}"
 ! MINGW-SAME: "[[object_file]]"
-! MINGW-SAME: "-lflang_rt.quadmath"
-! MINGW-NOT: "-lquadmath"
 ! MINGW-SAME: -lflang_rt.runtime
 ! MINGW-STATIC-FLANGRT: "{{.*}}{{\\|/}}libflang_rt.runtime.a"
 

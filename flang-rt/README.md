@@ -146,8 +146,8 @@ CMake itself provide.
    by `libflang_rt.quadmath`. Any other nonempty value is unsupported.
 
    When `libm` is selected automatically, configuration fails if its `sinl`
-   function cannot be found. The Flang driver does not add `-lquadmath`
-   automatically.
+   function cannot be found. The Flang driver adds `-lquadmath` only if it
+   finds `libquadmath` in the toolchain's library paths.
    [More details](../flang/docs/Real16MathSupport.md).
 
  * `FLANG_RT_EXPERIMENTAL_OFFLOAD_SUPPORT` (values: `"CUDA"`, `""` default: `""`)
