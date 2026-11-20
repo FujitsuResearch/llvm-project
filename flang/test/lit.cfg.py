@@ -289,7 +289,7 @@ def flang_frontend_supports_f128():
 
 # Add a feature for tests that require frontend F128 support.
 if flang_frontend_supports_f128():
-    config.available_features.add("flang-frontend-supports-f128")
+    config.available_features.add("flang-supports-f128-math")
 
 # Set OBJECT_MODE=64 as tools on AIX default to 32-bit.
 if "system-aix" in config.available_features:
