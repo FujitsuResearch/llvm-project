@@ -10,7 +10,7 @@ include(CheckIncludeFile)
 include(CMakePushCheckState)
 
 # Discover the GCC installation, when the build compiler is Clang,
-# and try to find quadmath.h there. Set FLANG_EVALUATE_INCLUDE_QUADMATH_H
+# and try to find quadmath.h there. Set FLANG_INCLUDE_QUADMATH_H
 # to the path to quadmath.h, if found.
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   if (NOT DEFINED FLANG_EVALUATE_GCC_RESOURCE_DIR)
@@ -47,7 +47,7 @@ endif ()
 check_include_file("quadmath.h" FLANG_EVALUATE_FOUND_QUADMATH_H)
 if (FLANG_EVALUATE_FOUND_QUADMATH_H)
   message(STATUS "quadmath.h found without additional include paths")
-  set(FLANG_EVALUATE_INCLUDE_QUADMATH_H "<quadmath.h>")
+  set(FLANG_INCLUDE_QUADMATH_H "<quadmath.h>")
 elseif (FLANG_EVALUATE_GCC_RESOURCE_DIR)
   cmake_push_check_state()
     list(APPEND CMAKE_REQUIRED_INCLUDES
@@ -56,7 +56,7 @@ elseif (FLANG_EVALUATE_GCC_RESOURCE_DIR)
   cmake_pop_check_state()
   if (FLANG_EVALUATE_FOUND_GCC_QUADMATH_H)
     message(STATUS "quadmath.h found in Clang's selected GCC installation")
-    set(FLANG_EVALUATE_INCLUDE_QUADMATH_H
+    set(FLANG_INCLUDE_QUADMATH_H
       "\"${FLANG_EVALUATE_GCC_RESOURCE_DIR}/include/quadmath.h\"")
   endif ()
 endif ()
