@@ -142,8 +142,8 @@ CMake itself provide.
    Determines the implementation of `REAL(16)` math functions. If set to
    `libquadmath`, uses `quadmath.h` and `-lquadmath` typically distributed with
    gcc. If empty, automatically uses `libm` when `long double` has 113
-   significand bits; otherwise, no `REAL(16)` math entry points are provided
-   by `libflang_rt.quadmath`. Any other nonempty value is unsupported.
+   significand bits; otherwise, `libflang_rt.quadmath` is not built. Any other
+   nonempty value is unsupported.
 
    When `libm` is selected automatically, configuration fails if its `sinl`
    function cannot be found. The Flang driver adds `-lquadmath` only if it

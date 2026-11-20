@@ -22,9 +22,10 @@ Otherwise, programs that require its functions must be linked with
 available in the library search paths, so that linker can find it. The `libquadmath` library installation into Flang project
 distribution is not automatic in CMake currently.
 
-`libflang_rt.quadmath` is built even without a math provider, but then
-contains no math entry points. For MSVC targets, the sources are instead
-included in `flang_rt.runtime` and no separate quadmath archive is built.
+`libflang_rt.quadmath` is not built if the target does not support
+`REAL(16)` or if no math provider is available. For MSVC targets, the sources
+are instead included in `flang_rt.runtime` and no separate quadmath archive is
+built.
 
 Testing shows that `libquadmath` versions before GCC-9.3.0 have
 accuracy issues, so it is recommended to distribute the Flang

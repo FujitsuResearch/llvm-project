@@ -7,8 +7,8 @@
 #===------------------------------------------------------------------------===#
 
 # FortranFloat128 implements IEEE-754 128-bit float math functions.
-# It uses a third-party library when one is configured for the target and
-# otherwise provides an empty archive.
+# It is a thin wapper and it currently relies on third-party
+# libraries available for the target.
 # It is distributed as a static library only.
 # Fortran programs/libraries that end up linking any of the provided
 # will have a dependency on the third-party library that is being
@@ -17,7 +17,7 @@
 include(CheckLibraryExists)
 include(CheckIncludeFile)
 
-set(math_sources
+set(sources
   acos.cpp
   acosh.cpp
   asin.cpp
@@ -69,7 +69,6 @@ set(math_sources
   y1.cpp
   yn.cpp
   )
-set(sources unsupported.cpp)
 
 include_directories(AFTER "${CMAKE_CURRENT_SOURCE_DIR}/..")
 add_library(FortranFloat128MathILib INTERFACE)
@@ -77,7 +76,11 @@ target_include_directories(FortranFloat128MathILib INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
   )
 
-if (FLANG_RUNTIME_F128_MATH_LIB)
+if (NOT FORTRAN_SUPPORTS_REAL16)
+  message(STATUS "Not building flang_rt.quadmath: "
+    "REAL(16) is not supported for ${LLVM_DEFAULT_TARGET_TRIPLE}")
+  return ()
+elseif (FLANG_RUNTIME_F128_MATH_LIB)
   if ("${FLANG_RUNTIME_F128_MATH_LIB}" STREQUAL "libquadmath")
     if(FLANG_INCLUDE_QUADMATH_H)
       target_compile_definitions(FortranFloat128MathILib INTERFACE
@@ -95,7 +98,7 @@ if (FLANG_RUNTIME_F128_MATH_LIB)
       "${FLANG_RUNTIME_F128_MATH_LIB}"
       )
   endif()
-  list(APPEND sources ${math_sources})
+  message(STATUS "Building flang_rt.quadmath using libquadmath")
 elseif (HAVE_LDBL_MANT_DIG_113)
   # We can use 'long double' versions from libc.
   check_library_exists(m sinl "" FOUND_LIBM)
@@ -106,10 +109,15 @@ elseif (HAVE_LDBL_MANT_DIG_113)
     target_include_directories(FortranFloat128MathILib INTERFACE
       "${FLANG_RT_SOURCE_DIR}/lib/flang_rt"
       )
-    list(APPEND sources ${math_sources})
+    message(STATUS "Building flang_rt.quadmath using libm's long double functions")
   else()
     message(FATAL_ERROR "Flang-RT cannot build without libm")
   endif()
+else()
+  message(STATUS "Not building flang_rt.quadmath: "
+    "no REAL(16) math implementation available "
+    "(set FLANG_RUNTIME_F128_MATH_LIB=libquadmath to use libquadmath)")
+  return ()
 endif()
 
 if (MSVC)
