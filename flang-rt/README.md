@@ -137,17 +137,19 @@ CMake itself provide.
    When `OFF`, does not add any tests and unittests. The `check-flang-rt`
    build target will do nothing.
 
- * `FLANG_RUNTIME_F128_MATH_LIB` (default: `""`)
+ * `FLANG_RUNTIME_F128_MATH_LIB` (values: `NO`, `libquadmath`,
+   `"long double"`, `float128`; default: autodetected)
 
-   Determines the implementation of `REAL(16)` math functions. If set to
-   `libquadmath`, uses `quadmath.h` and `-lquadmath` typically distributed with
-   gcc. If empty, automatically uses `libm` when `long double` has 113
-   significand bits; otherwise, `libflang_rt.quadmath` is not built. Any other
-   nonempty value is unsupported.
+   Determines the implementation of `REAL(16)` math functions in
+   `libflang_rt.quadmath`. `libquadmath` uses `quadmath.h` and `-lquadmath`
+   typically distributed with gcc. `"long double"` uses the `libm` functions for
+   a `long double` with 113 significand bits. `float128` uses the `libm`
+   functions for `_Float128`. If `NO` (or any other CMake false value),
+   `libflang_rt.quadmath` is not built. The default is the first available of
+   `"long double"`, `float128`, and `libquadmath`, otherwise `NO`.
 
-   When `libm` is selected automatically, configuration fails if its `sinl`
-   function cannot be found. The Flang driver adds `-lquadmath` only if it
-   finds `libquadmath` in the toolchain's library paths.
+   The Flang driver adds `-lquadmath` only if it finds `libquadmath` in the
+   toolchain's library paths.
    [More details](../flang/docs/Real16MathSupport.md).
 
  * `FLANG_RT_EXPERIMENTAL_OFFLOAD_SUPPORT` (values: `"CUDA"`, `""` default: `""`)

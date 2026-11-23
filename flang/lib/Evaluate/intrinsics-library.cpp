@@ -581,6 +581,90 @@ template <> struct HostRuntimeLibrary<__complex128, LibraryVersion::Libm> {
 };
 #endif // HAS_QUADMATHLIB
 
+#if HAS_LIBMF128
+// The C complex functions are not declared by C++ headers.
+using host::CFloat128Complex;
+extern "C" {
+CFloat128Complex cacosf128(CFloat128Complex);
+CFloat128Complex cacoshf128(CFloat128Complex);
+CFloat128Complex casinf128(CFloat128Complex);
+CFloat128Complex casinhf128(CFloat128Complex);
+CFloat128Complex catanf128(CFloat128Complex);
+CFloat128Complex catanhf128(CFloat128Complex);
+CFloat128Complex ccosf128(CFloat128Complex);
+CFloat128Complex ccoshf128(CFloat128Complex);
+CFloat128Complex cexpf128(CFloat128Complex);
+CFloat128Complex clogf128(CFloat128Complex);
+CFloat128Complex cpowf128(CFloat128Complex, CFloat128Complex);
+CFloat128Complex csinf128(CFloat128Complex);
+CFloat128Complex csinhf128(CFloat128Complex);
+CFloat128Complex csqrtf128(CFloat128Complex);
+CFloat128Complex ctanf128(CFloat128Complex);
+CFloat128Complex ctanhf128(CFloat128Complex);
+}
+
+template <> struct HostRuntimeLibrary<_Float128, LibraryVersion::Libm> {
+  using F = FuncPointer<_Float128, _Float128>;
+  using F2 = FuncPointer<_Float128, _Float128, _Float128>;
+  using FN = FuncPointer<_Float128, int, _Float128>;
+  static constexpr HostRuntimeFunction table[]{
+      FolderFactory<F, F{::acosf128}>::Create("acos"),
+      FolderFactory<F, F{::acoshf128}>::Create("acosh"),
+      FolderFactory<F, F{::asinf128}>::Create("asin"),
+      FolderFactory<F, F{::asinhf128}>::Create("asinh"),
+      FolderFactory<F, F{::atanf128}>::Create("atan"),
+      FolderFactory<F2, F2{::atan2f128}>::Create("atan2"),
+      FolderFactory<F, F{::atanhf128}>::Create("atanh"),
+      FolderFactory<F, F{::j0f128}>::Create("bessel_j0"),
+      FolderFactory<F, F{::j1f128}>::Create("bessel_j1"),
+      FolderFactory<FN, FN{::jnf128}>::Create("bessel_jn"),
+      FolderFactory<F, F{::y0f128}>::Create("bessel_y0"),
+      FolderFactory<F, F{::y1f128}>::Create("bessel_y1"),
+      FolderFactory<FN, FN{::ynf128}>::Create("bessel_yn"),
+      FolderFactory<F, F{::cosf128}>::Create("cos"),
+      FolderFactory<F, F{::coshf128}>::Create("cosh"),
+      FolderFactory<F, F{::erff128}>::Create("erf"),
+      FolderFactory<F, F{::erfcf128}>::Create("erfc"),
+      FolderFactory<F, F{::expf128}>::Create("exp"),
+      FolderFactory<F, F{::tgammaf128}>::Create("gamma"),
+      FolderFactory<F, F{::logf128}>::Create("log"),
+      FolderFactory<F, F{::log10f128}>::Create("log10"),
+      FolderFactory<F, F{::lgammaf128}>::Create("log_gamma"),
+      FolderFactory<F2, F2{::powf128}>::Create("pow"),
+      FolderFactory<F, F{::sinf128}>::Create("sin"),
+      FolderFactory<F, F{::sinhf128}>::Create("sinh"),
+      FolderFactory<F, F{::tanf128}>::Create("tan"),
+      FolderFactory<F, F{::tanhf128}>::Create("tanh"),
+  };
+  static constexpr HostRuntimeMap map{table};
+  static_assert(map.Verify(), "map must be sorted");
+};
+template <> struct HostRuntimeLibrary<CFloat128Complex, LibraryVersion::Libm> {
+  using F = FuncPointer<CFloat128Complex, CFloat128Complex>;
+  using F2 = FuncPointer<CFloat128Complex, CFloat128Complex, CFloat128Complex>;
+  static constexpr HostRuntimeFunction table[]{
+      FolderFactory<F, F{cacosf128}>::Create("acos"),
+      FolderFactory<F, F{cacoshf128}>::Create("acosh"),
+      FolderFactory<F, F{casinf128}>::Create("asin"),
+      FolderFactory<F, F{casinhf128}>::Create("asinh"),
+      FolderFactory<F, F{catanf128}>::Create("atan"),
+      FolderFactory<F, F{catanhf128}>::Create("atanh"),
+      FolderFactory<F, F{ccosf128}>::Create("cos"),
+      FolderFactory<F, F{ccoshf128}>::Create("cosh"),
+      FolderFactory<F, F{cexpf128}>::Create("exp"),
+      FolderFactory<F, F{clogf128}>::Create("log"),
+      FolderFactory<F2, F2{cpowf128}>::Create("pow"),
+      FolderFactory<F, F{csinf128}>::Create("sin"),
+      FolderFactory<F, F{csinhf128}>::Create("sinh"),
+      FolderFactory<F, F{csqrtf128}>::Create("sqrt"),
+      FolderFactory<F, F{ctanf128}>::Create("tan"),
+      FolderFactory<F, F{ctanhf128}>::Create("tanh"),
+  };
+  static constexpr HostRuntimeMap map{table};
+  static_assert(map.Verify(), "map must be sorted");
+};
+#endif // HAS_LIBMF128
+
 /// Define pgmath description
 #if LINK_WITH_LIBPGMATH
 // Only use libpgmath for folding if it is available.
@@ -694,6 +778,11 @@ static const HostRuntimeMap *GetHostRuntimeMapVersion(DynamicType resultType) {
             GetHostRuntimeMapHelper<__float128, version>(resultType)}) {
       return map;
     }
+#elif HAS_LIBMF128
+    if (const auto *map{
+            GetHostRuntimeMapHelper<_Float128, version>(resultType)}) {
+      return map;
+    }
 #endif
   }
   if (resultType.category() == TypeCategory::Complex) {
@@ -713,6 +802,11 @@ static const HostRuntimeMap *GetHostRuntimeMapVersion(DynamicType resultType) {
 #if HAS_QUADMATHLIB
     if (const auto *map{
             GetHostRuntimeMapHelper<__complex128, version>(resultType)}) {
+      return map;
+    }
+#elif HAS_LIBMF128
+    if (const auto *map{
+            GetHostRuntimeMapHelper<CFloat128Complex, version>(resultType)}) {
       return map;
     }
 #endif

@@ -31,6 +31,30 @@
 #define CSqrt(x) csqrtq(x)
 #define CTan(x) ctanq(x)
 #define CTanh(x) ctanhq(x)
+#elif HAS_LIBMF128
+/* Use _Float128 versions of libm functions.
+ * __STDC_WANT_IEC_60559_TYPES_EXT__ needs to be defined
+ * before including complex.h to enable the *f128 prototypes. */
+#define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
+#include <complex.h>
+
+#define CAbs(x) cabsf128(x)
+#define CAcos(x) cacosf128(x)
+#define CAcosh(x) cacoshf128(x)
+#define CAsin(x) casinf128(x)
+#define CAsinh(x) casinhf128(x)
+#define CAtan(x) catanf128(x)
+#define CAtanh(x) catanhf128(x)
+#define CCos(x) ccosf128(x)
+#define CCosh(x) ccoshf128(x)
+#define CExp(x) cexpf128(x)
+#define CLog(x) clogf128(x)
+#define CPow(x, p) cpowf128(x, p)
+#define CSin(x) csinf128(x)
+#define CSinh(x) csinhf128(x)
+#define CSqrt(x) csqrtf128(x)
+#define CTan(x) ctanf128(x)
+#define CTanh(x) ctanhf128(x)
 #elif HAS_LDBL128
 /* Use 'long double' versions of libm functions. */
 #include <complex.h>
@@ -52,11 +76,6 @@
 #define CSqrt(x) csqrtl(x)
 #define CTan(x) ctanl(x)
 #define CTanh(x) ctanhl(x)
-#elif HAS_LIBMF128
-/* We can use __float128 versions of libm functions.
- * __STDC_WANT_IEC_60559_TYPES_EXT__ needs to be defined
- * before including math.h to enable the *f128 prototypes. */
-#error "Float128Math build with glibc>=2.26 is unsupported yet"
 #endif
 
 #endif /* FLANG_RT_QUADMATH_COMPLEX_MATH_H_ */

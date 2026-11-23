@@ -681,10 +681,6 @@ if(build_runtimes)
   if(LLVM_LIBC_FULL_BUILD)
     list(APPEND extra_cmake_args "-DLLVM_LIBC_FULL_BUILD=ON")
   endif()
-  if(DEFINED FLANG_RUNTIME_F128_MATH_LIB)
-    list(APPEND extra_cmake_args
-      "-DFLANG_RUNTIME_F128_MATH_LIB=${FLANG_RUNTIME_F128_MATH_LIB}")
-  endif()
   if("flang" IN_LIST LLVM_ENABLE_PROJECTS)
     # Allow runtimes that can use it to access the Flang compiler
     if ("openmp" IN_LIST LLVM_ENABLE_RUNTIMES OR "flang-rt" IN_LIST LLVM_ENABLE_RUNTIMES)

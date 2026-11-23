@@ -278,7 +278,7 @@ public:
   void setDefaultFortranOpts();
 
   /// Set the default predefinitions.
-  void setDefaultPredefinitions();
+  void setDefaultPredefinitions(const llvm::TargetMachine &targetMachine);
 
   /// Collect the macro definitions from preprocessorOpts_ and prepare them for
   /// the parser (i.e. copy into parserOpts_)

@@ -69,10 +69,8 @@ list(APPEND CMAKE_MODULE_PATH
 include(AddFlangRT)
 include(GetToolchainDirs)
 include(FlangCommon)
-include(FlangRTFloat128)
 include(HandleCompilerRT)
 include(ExtendPath)
-include(FlangRTIntrospection)
 
 
 ############################
@@ -202,10 +200,6 @@ check_cxx_source_compiles(
   "
   HAVE_DECL_STRERROR_S)
 
-# Determine support of REAL(16), if not already defined via command
-# line via -DFORTRAN_SUPPORTS_REAL16=YES/NO
-check_fortran_quadmath_support()
-
 # Search for clang_rt.builtins library. Need in addition to msvcrt.
 if (WIN32)
   find_compiler_rt_library(builtins FLANG_RT_BUILTINS_LIBRARY)
@@ -217,9 +211,6 @@ if (UNIX AND CMAKE_SYSTEM_NAME MATCHES "AIX")
   add_compile_definitions(_XOPEN_SOURCE=700)
   add_compile_definitions(_LARGE_FILE_API)
 endif ()
-
-# Indicates whether the Fortran compiler supports REAL(16) for this target.
-add_compile_definitions(FLANG_RT_SUPPORTS_REAL16=$<BOOL:${FORTRAN_SUPPORTS_REAL16}>)
 
 # Check whether the compiler can undefine a macro using the "-Wp,-U" flag.
 # Aternatively, we could use

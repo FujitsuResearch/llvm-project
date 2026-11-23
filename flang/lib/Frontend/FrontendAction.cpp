@@ -89,7 +89,7 @@ bool FrontendAction::beginSourceFile(CompilerInstance &ci,
       (invoc.getPreprocessorOpts().macrosFlag == PPMacrosFlag::Unknown &&
        getCurrentInput().getMustBePreprocessed());
   if (includeMacros) {
-    invoc.setDefaultPredefinitions();
+    invoc.setDefaultPredefinitions(ci.getTargetMachine());
     invoc.collectMacroDefinitions();
   }
   invoc.getFortranOpts().preprocessingEnabled = includeMacros;
