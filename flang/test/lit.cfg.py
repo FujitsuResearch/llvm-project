@@ -288,10 +288,11 @@ def flang_frontend_supports_f128():
 
 
 # Despite its name, this feature tests frontend F128 support, not math libraries.
-supports_f128 = flang_frontend_supports_f128()
-lit_config.note(f"frontend F128 support for {config.target_triple}: {supports_f128}")
-if supports_f128:
+if flang_frontend_supports_f128():
+    lit_config.note("REAL(16) tests enabled")
     config.available_features.add("flang-supports-f128-math")
+else:
+    lit_config.note("REAL(16) tests skipped")
 
 # Set OBJECT_MODE=64 as tools on AIX default to 32-bit.
 if "system-aix" in config.available_features:

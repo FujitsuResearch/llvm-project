@@ -1,5 +1,3 @@
-include(CheckLibraryExists)
-
 if (LIBPGMATH_DIR)
   # If pgmath library is found, it can be used for constant folding.
   find_library(LIBPGMATH pgmath PATHS ${LIBPGMATH_DIR})
@@ -21,11 +19,15 @@ if (LIBPGMATH_DIR)
   endif()
 endif()
 
-check_library_exists(quadmath sinq "" FOUND_QUADMATH_LIB)
-if (FLANG_EVALUATE_INCLUDE_QUADMATH_H AND FOUND_QUADMATH_LIB)
+# Use the same implementation of REAL(16) math functions for constant folding
+# as Flang-RT. 'long double' is used without additional configuration.
+if (FLANG_RUNTIME_F128_MATH_LIB STREQUAL "libquadmath")
   configure_file("${FLANG_SOURCE_DIR}/cmake/quadmath_wrapper.h.in" "${CMAKE_CURRENT_BINARY_DIR}/quadmath_wrapper.h")
   add_compile_definitions(HAS_QUADMATHLIB)
-  set(QUADMATHLIB quadmath)
+  set(F128MATHLIB quadmath)
+elseif (FLANG_RUNTIME_F128_MATH_LIB STREQUAL "float128")
+  add_compile_definitions(HAS_LIBMF128)
+  set(F128MATHLIB m)
 endif ()
 
 add_flang_library(FortranEvaluate
@@ -71,7 +73,7 @@ add_flang_library(FortranEvaluate
   FortranDecimal
   FortranParser
   ${LIBPGMATH}
-  ${QUADMATHLIB}
+  ${F128MATHLIB}
 
   DISABLE_PCH_REUSE
   PRECOMPILE_HEADERS

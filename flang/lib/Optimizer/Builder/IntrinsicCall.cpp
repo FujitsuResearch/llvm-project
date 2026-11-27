@@ -965,8 +965,8 @@ static std::string prettyPrintIntrinsicName(mlir::Location loc,
 
 // Generate a call to the Fortran runtime library providing
 // support for 128-bit float math.
-// The implementation is provided by flang_rt or libflang_rt.quadmath,
-// depending on the target.
+// The implementation is provided by libflang_rt.quadmath
+// (or flang_rt.runtime itself on Windows).
 static mlir::Value genLibF128Call(fir::FirOpBuilder &builder,
                                   mlir::Location loc,
                                   const MathOperation &mathOp,

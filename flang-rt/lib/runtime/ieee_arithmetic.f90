@@ -171,7 +171,7 @@ module ieee_arithmetic
 #define SPECIFICS_L(G) \
   G(1) G(2) G(4) G(8)
 
-#if FLANG_SUPPORT_R16
+#if __GFC_REAL_16__
 #if __x86_64__
 #define SPECIFICS_R(G) \
   G(2) G(3) G(4) G(8) G(10) G(16)
@@ -196,7 +196,7 @@ module ieee_arithmetic
   G(8,1) G(8,2) G(8,4) G(8,8) G(8,16) \
   G(16,1) G(16,2) G(16,4) G(16,8) G(16,16)
 
-#if FLANG_SUPPORT_R16
+#if __GFC_REAL_16__
 #if __x86_64__
 #define SPECIFICS_RI(G) \
   G(2,1) G(2,2) G(2,4) G(2,8) G(2,16) \
@@ -230,7 +230,7 @@ module ieee_arithmetic
 #endif
 #endif
 
-#if FLANG_SUPPORT_R16
+#if __GFC_REAL_16__
 #if __x86_64__
 #define SPECIFICS_RR(G) \
   G(2,2) G(2,3) G(2,4) G(2,8) G(2,10) G(2,16) \

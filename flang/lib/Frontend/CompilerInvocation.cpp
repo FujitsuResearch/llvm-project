@@ -2015,7 +2015,8 @@ void CompilerInvocation::setDefaultFortranOpts() {
 // TODO: When expanding this method, consider creating a dedicated API for
 // this. Also at some point we will need to differentiate between different
 // targets and add dedicated predefines for each.
-void CompilerInvocation::setDefaultPredefinitions() {
+void CompilerInvocation::setDefaultPredefinitions(
+    const llvm::TargetMachine &targetMachine) {
   auto &fortranOptions = getFortranOpts();
   const auto &frontendOptions = getFrontendOpts();
   // Populate the macro list with version numbers and other predefinitions.
@@ -2090,6 +2091,19 @@ void CompilerInvocation::setDefaultPredefinitions() {
     fortranOptions.predefinitions.emplace_back("__s390x", "1");
     break;
   }
+
+  // Indicate the availability of the extended REAL kinds using gfortran's
+  // macro names.
+  Fortran::evaluate::TargetCharacteristics targetCharacteristics;
+  Fortran::tools::setUpTargetCharacteristics(
+      targetCharacteristics, targetMachine, getTargetOpts(),
+      /*compilerVersion=*/"", /*compilerOptions=*/"");
+  if (targetCharacteristics.IsTypeEnabled(Fortran::common::TypeCategory::Real,
+                                          10))
+    fortranOptions.predefinitions.emplace_back("__GFC_REAL_10__", "1");
+  if (targetCharacteristics.IsTypeEnabled(Fortran::common::TypeCategory::Real,
+                                          16))
+    fortranOptions.predefinitions.emplace_back("__GFC_REAL_16__", "1");
 }
 
 void CompilerInvocation::setFortranOpts() {

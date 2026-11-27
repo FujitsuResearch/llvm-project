@@ -23,6 +23,15 @@
 #include "flang/Common/type-kinds.h"
 #include <cstdint>
 
+// Flang supports REAL(16) for all targets except GPUs and shader targets
+// (see flang/include/flang/Tools/TargetSetup.h).
+#if defined(__AMDGPU__) || defined(__NVPTX__) || defined(__SPIR__) || \
+    defined(__SPIRV__) || defined(__DXIL__)
+#define HAS_REAL16_KIND 0
+#else
+#define HAS_REAL16_KIND 1
+#endif
+
 // Fortran merge(tsource, fsource, mask) to match the source module style.
 static constexpr std::int32_t Merge(
     std::int32_t tsource, std::int32_t fsource, bool mask) {
@@ -109,15 +118,15 @@ static constexpr std::int32_t selectedBfloat16{3};
 static constexpr std::int32_t selectedReal32{4};
 static constexpr std::int32_t selectedReal64{8};
 
-#if FLANG_RT_SUPPORTS_REAL16
-static constexpr std::int32_t selectedReal80{16};
-#elif HAS_FLOAT80
+#if HAS_FLOAT80
 static constexpr std::int32_t selectedReal80{10};
+#elif HAS_REAL16_KIND
+static constexpr std::int32_t selectedReal80{16};
 #else
 static constexpr std::int32_t selectedReal80{-3};
 #endif
 
-#if FLANG_RT_SUPPORTS_REAL16
+#if HAS_REAL16_KIND
 static constexpr std::int32_t selectedReal64x2{16};
 static constexpr std::int32_t selectedReal128{16};
 #elif HAS_FLOAT80
@@ -245,7 +254,7 @@ extern const std::int32_t FORTRAN_NAMED_CONST(__builtin_real_kinds)[]{
 #if HAS_FLOAT80
     10,
 #endif
-#if FLANG_RT_SUPPORTS_REAL16
+#if HAS_REAL16_KIND
     16,
 #endif
 };

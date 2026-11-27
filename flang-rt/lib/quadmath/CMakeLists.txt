@@ -7,17 +7,14 @@
 #===------------------------------------------------------------------------===#
 
 # FortranFloat128 implements IEEE-754 128-bit float math functions.
-# It uses a third-party library when one is configured for the target and
-# otherwise provides an empty archive.
+# It is a thin wapper and it currently relies on third-party
+# libraries available for the target.
 # It is distributed as a static library only.
 # Fortran programs/libraries that end up linking any of the provided
 # will have a dependency on the third-party library that is being
 # used for building this libflang_rt.quadmath library.
 
-include(CheckLibraryExists)
-include(CheckIncludeFile)
-
-set(math_sources
+set(sources
   acos.cpp
   acosh.cpp
   asin.cpp
@@ -69,7 +66,6 @@ set(math_sources
   y1.cpp
   yn.cpp
   )
-set(sources unsupported.cpp)
 
 include_directories(AFTER "${CMAKE_CURRENT_SOURCE_DIR}/..")
 add_library(FortranFloat128MathILib INTERFACE)
@@ -77,40 +73,25 @@ target_include_directories(FortranFloat128MathILib INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
   )
 
-if (FLANG_RUNTIME_F128_MATH_LIB)
-  if (${FLANG_RUNTIME_F128_MATH_LIB} STREQUAL "libquadmath")
-    if(FLANG_INCLUDE_QUADMATH_H)
-      target_compile_definitions(FortranFloat128MathILib INTERFACE
-        HAS_QUADMATHLIB
-        )
-    else()
-      message(FATAL_ERROR
-        "FLANG_RUNTIME_F128_MATH_LIB setting requires quadmath.h "
-        "to be available: ${FLANG_RUNTIME_F128_MATH_LIB}"
-        )
-    endif()
-  else()
-    message(FATAL_ERROR
-      "Unsupported third-party library for Fortran F128 math runtime: "
-      "${FLANG_RUNTIME_F128_MATH_LIB}"
-      )
-  endif()
-  list(APPEND sources ${math_sources})
-elseif (HAVE_LDBL_MANT_DIG_113)
-  # We can use 'long double' versions from libc.
-  check_library_exists(m sinl "" FOUND_LIBM)
-  if (FOUND_LIBM)
-    target_compile_definitions(FortranFloat128MathILib INTERFACE
-      HAS_LIBM
-      )
-    target_include_directories(FortranFloat128MathILib INTERFACE
-      "${FLANG_RT_SOURCE_DIR}/lib/flang_rt"
-      )
-    list(APPEND sources ${math_sources})
-  else()
-    message(FATAL_ERROR "Flang-RT cannot build without libm")
-  endif()
-endif()
+# FLANG_RUNTIME_F128_MATH_LIB is validated by FlangCommon.cmake.
+if (NOT FLANG_RUNTIME_F128_MATH_LIB)
+  message(STATUS "Not building flang_rt.quadmath: "
+    "FLANG_RUNTIME_F128_MATH_LIB=${FLANG_RUNTIME_F128_MATH_LIB}")
+  return ()
+elseif (FLANG_RUNTIME_F128_MATH_LIB STREQUAL "libquadmath")
+  target_compile_definitions(FortranFloat128MathILib INTERFACE
+    HAS_QUADMATHLIB
+    )
+  message(STATUS "Building flang_rt.quadmath using libquadmath")
+elseif (FLANG_RUNTIME_F128_MATH_LIB STREQUAL "long double")
+  # HAS_LDBL128 is defined by flang/Common/float128.h.
+  message(STATUS "Building flang_rt.quadmath using libm's long double functions")
+elseif (FLANG_RUNTIME_F128_MATH_LIB STREQUAL "float128")
+  target_compile_definitions(FortranFloat128MathILib INTERFACE
+    HAS_LIBMF128
+    )
+  message(STATUS "Building flang_rt.quadmath using libm's _Float128 functions")
+endif ()
 
 if (MSVC)
   # The Flang driver does not link flang_rt.quadmath for MSVC targets.

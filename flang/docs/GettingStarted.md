@@ -305,11 +305,6 @@ commodity machines.
 
 ### Build options
 
-Flang-RT's `REAL(16)` math provider can be selected with the
-`FLANG_RUNTIME_F128_MATH_LIB` CMake variable. See
-[Flang support for REAL(16)](Real16MathSupport.md) for the available providers
-and their linking requirements.
-
 ## Supported C++ compilers
 
 Flang is written in C++17.

@@ -20,6 +20,8 @@
 #if HAS_QUADMATHLIB
 #include "quadmath_wrapper.h"
 #include "flang/Common/float128.h"
+#elif HAS_LIBMF128
+#include <math.h>
 #endif
 #include "flang/Evaluate/type.h"
 #include "flang/Evaluate/typekind-traits.h"
@@ -164,6 +166,11 @@ template <> struct HostTypeHelper<TypeKind<TypeCategory::Real, 16>> {
   // IEEE 754 128bits
   using Type = __float128;
 };
+#elif HAS_LIBMF128
+template <> struct HostTypeHelper<TypeKind<TypeCategory::Real, 16>> {
+  // IEEE 754 128bits
+  using Type = _Float128;
+};
 #else
 template <> struct HostTypeHelper<TypeKind<TypeCategory::Real, 16>> {
   // IEEE 754 128bits
@@ -185,6 +192,20 @@ struct HostTypeHelper<TypeKind<TypeCategory::Complex, KIND>> {
 template <> struct HostTypeHelper<TypeKind<TypeCategory::Complex, 16>> {
   using RealT = TypeKind<TypeCategory::Real, 16>;
   using Type = __complex128;
+};
+#elif HAS_LIBMF128
+// C complex type of the libm *f128 functions.
+#ifdef __clang_major__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc99-extensions"
+#endif
+__extension__ typedef __CFLOAT128 CFloat128Complex;
+#ifdef __clang_major__
+#pragma clang diagnostic pop
+#endif
+template <> struct HostTypeHelper<TypeKind<TypeCategory::Complex, 16>> {
+  using RealT = TypeKind<TypeCategory::Real, 16>;
+  using Type = CFloat128Complex;
 };
 #endif
 
