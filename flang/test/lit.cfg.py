@@ -287,7 +287,7 @@ def flang_frontend_supports_f128():
     return flang_cmd.returncode == 0
 
 
-# Add a feature for tests that require frontend F128 support.
+# Despite its name, this feature tests frontend F128 support, not math libraries.
 if flang_frontend_supports_f128():
     lit_config.note("REAL(16) tests enabled")
     config.available_features.add("flang-supports-f128-math")
